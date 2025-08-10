@@ -1,0 +1,486 @@
+\<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Two Years of Us ❤️</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- DESIGN SYSTEM & SETUP --- */
+        :root {
+            --blush-pink: #fcefee;
+            --soft-pink: #f5cac3;
+            --darker-pink: #e0a198;
+            --cream: #f7f7f7;
+            --gold: #d4af37;
+            --text-dark: #5a3e3e;
+            --handwriting-font: 'Caveat', cursive;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: var(--handwriting-font);
+            background-color: var(--blush-pink);
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        /* --- REUSABLE COMPONENTS --- */
+        .section {
+            padding: 10vh 5vw;
+            position: relative;
+            z-index: 2;
+            background-color: var(--blush-pink);
+        }
+        .section-title {
+            font-size: clamp(3rem, 10vw, 5.5rem);
+            font-weight: 700;
+            color: var(--soft-pink);
+            text-align: center;
+            margin-bottom: 5vh;
+            line-height: 1.1;
+        }
+
+        /* --- PARALLAX SECTION --- */
+        .parallax {
+            min-height: 100vh;
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            position: relative;
+            z-index: 1;
+        }
+        #hero-parallax { background-image: url('images/hero-image.jpg'); }
+
+        /* --- HERO SECTION --- */
+        .hero-content {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.6);
+            position: relative;
+            z-index: 2;
+        }
+        .hero-content h1 { font-size: clamp(4rem, 15vw, 9rem); font-weight: 700; }
+        .hero-content p { font-size: clamp(1.8rem, 5vw, 2.5rem); margin-top: -20px; }
+
+        /* --- FLOATING HEARTS --- */
+        .hearts-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 999;
+        }
+        .heart {
+            position: absolute; bottom: -50px; font-size: 20px;
+            color: var(--soft-pink); animation: floatUp 10s infinite linear; opacity: 0.7;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0.7; }
+            100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* --- SLIDING LOVE QUOTES --- */
+        .love-quote {
+            font-size: clamp(2rem, 6vw, 3.5rem); text-align: center; padding: 5vh 5vw;
+            font-weight: 500; opacity: 0; transform: translateY(50px);
+            transition: opacity 1s ease, transform 1s ease;
+        }
+        .love-quote.visible { opacity: 1; transform: translateY(0); }
+
+        /* --- TIMELINE SECTION --- */
+        .timeline { position: relative; max-width: 1200px; margin: 0 auto; }
+        .timeline::after {
+            content: ''; position: absolute; width: 6px; background-color: var(--soft-pink);
+            top: 0; bottom: 0; left: 50%; margin-left: -3px;
+        }
+        .timeline-container {
+            padding: 10px 40px; position: relative; width: 50%; opacity: 0;
+            transform: translateY(50px); transition: all 0.8s ease;
+        }
+        .timeline-container.visible { opacity: 1; transform: translateY(0); }
+        .timeline-container.left { left: 0; }
+        .timeline-container.right { left: 50%; }
+        .timeline-container::after {
+            content: '❤'; position: absolute; width: 25px; height: 25px; right: -17px;
+            background-color: white; border: 4px solid var(--soft-pink); top: 15px;
+            border-radius: 50%; z-index: 1; font-size: 15px; text-align: center;
+            line-height: 1; color: var(--soft-pink);
+        }
+        .right::after { left: -16px; }
+        .timeline-content {
+            padding: 20px 30px; background-color: white; position: relative;
+            border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border: 1px solid var(--blush-pink);
+        }
+        .timeline-content h3 { font-size: 2rem; color: var(--text-dark); font-weight: 700; }
+        .timeline-content p { font-size: 1.5rem; }
+        .date { font-size: 1.2rem; font-weight: 700; color: var(--gold); margin-bottom: 10px; }
+        
+        /* --- RECTIFIED: LOVE IN BLOOM SVG ANIMATION --- */
+        #love-grows-section { text-align: center; }
+        .love-tree-svg {
+            max-width: 600px;
+            width: 100%;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .love-tree-svg .branch {
+            fill: none;
+            stroke: var(--text-dark);
+            stroke-width: 8;
+            stroke-dasharray: 1; /* These get replaced by JS */
+            stroke-dashoffset: 1; /* These get replaced by JS */
+        }
+        .love-tree-svg .love-flower {
+            fill: var(--darker-pink);
+            stroke: var(--text-dark);
+            stroke-width: 1;
+            font-size: 40px;
+            opacity: 0;
+            transform-origin: center;
+            transform-box: fill-box;
+        }
+        .love-tree-svg.start-growing .branch { animation: draw 1.5s ease-out forwards; }
+        .love-tree-svg.start-growing .love-flower { animation: bloom 0.8s ease-out forwards; }
+        /* Staggered animation delays for a fuller tree */
+        .love-tree-svg.start-growing .branch-2  { animation-delay: 0.2s; }
+        .love-tree-svg.start-growing .branch-3  { animation-delay: 0.4s; }
+        .love-tree-svg.start-growing .branch-4  { animation-delay: 0.6s; }
+        .love-tree-svg.start-growing .branch-5  { animation-delay: 0.8s; }
+        .love-tree-svg.start-growing .branch-6  { animation-delay: 1.0s; }
+        .love-tree-svg.start-growing .branch-7  { animation-delay: 1.2s; }
+        /* Flower delays are timed to start as branches finish */
+        .love-tree-svg.start-growing .flower-1  { animation-delay: 1.5s; }
+        .love-tree-svg.start-growing .flower-2  { animation-delay: 1.7s; }
+        .love-tree-svg.start-growing .flower-3  { animation-delay: 1.9s; }
+        .love-tree-svg.start-growing .flower-4  { animation-delay: 2.1s; }
+        .love-tree-svg.start-growing .flower-5  { animation-delay: 2.3s; }
+        .love-tree-svg.start-growing .flower-6  { animation-delay: 2.5s; }
+        .love-tree-svg.start-growing .flower-7  { animation-delay: 2.7s; }
+        .love-tree-svg.start-growing .flower-8  { animation-delay: 1.8s; }
+        .love-tree-svg.start-growing .flower-9  { animation-delay: 2.0s; }
+        .love-tree-svg.start-growing .flower-10 { animation-delay: 2.2s; }
+        .love-tree-svg.start-growing .flower-11 { animation-delay: 2.4s; }
+        .love-tree-svg.start-growing .flower-12 { animation-delay: 2.6s; }
+        .love-tree-svg.start-growing .flower-13 { animation-delay: 2.8s; }
+
+        @keyframes draw { to { stroke-dashoffset: 0; } }
+        @keyframes bloom {
+            0% { opacity: 0; transform: scale(0); }
+            70% { opacity: 1; transform: scale(1.2); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        /* --- LOVE LETTER SECTION --- */
+        .love-letter {
+            max-width: 800px; margin: 0 auto; background: white; padding: 50px;
+            border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transform: rotate(-1.5deg); border: 1px solid var(--blush-pink);
+        }
+        .love-letter p { font-size: 1.8rem; line-height: 1.8; margin-bottom: 20px; }
+        .signature { font-size: 2.5rem; text-align: right; color: var(--soft-pink); font-weight: 700; }
+        
+        /* --- CELEBRATION CAKE SECTION --- */
+        .cake-container { display: flex; justify-content: center; align-items: center; padding: 5vh 0;}
+        .cake { position: relative; width: 250px; height: 200px; }
+        .plate {
+            width: 270px; height: 110px; position: absolute; bottom: -10px; left: -10px;
+            background-color: #f7f7f7; box-shadow: 0 2px 0 #b3b3b3, 0 4px 0 #b3b3b3, 0 5px 40px rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+        }
+        .layer {
+            position: absolute; display: block; width: 250px; height: 100px;
+            border-radius: 50%; background-color: var(--soft-pink);
+            box-shadow: 0 2px 0px var(--soft-pink), 0 4px 0px #c9a39e, 0 6px 0px #c9a39e, 0 8px 0px #c9a39e, 0 10px 0px #c9a39e;
+        }
+        .icing {
+            position: absolute; top: 0; left: 0; width: 100%; height: 50px;
+            background-color: white; border-radius: 50%;
+        }
+        .drip {
+            position: absolute; width: 50px; height: 60px;
+            border-bottom-left-radius: 25px; border-bottom-right-radius: 25px;
+            background-color: white;
+        }
+        .drip1 { top: 30px; left: 5px; transform: skewY(15deg); }
+        .drip2 { top: 25px; left: 80px; width: 60px; }
+        .drip3 { top: 30px; right: 5px; transform: skewY(-15deg); }
+        .candle {
+            position: absolute; width: 12px; height: 50px;
+            background-color: var(--gold); top: -40px;
+        }
+        .candle1 { left: 60px; }
+        .candle2 { right: 60px; }
+        .flame {
+            position: absolute; width: 15px; height: 35px;
+            background-color: #ffc864; border-radius: 10px 10px 10px 10px / 25px 25px 10px 10px;
+            top: -35px; transform-origin: 50% 90%; animation: flicker 1s ease-in-out infinite;
+        }
+        @keyframes flicker {
+            0% { transform: scaleY(1); opacity: 1; }
+            50% { transform: scaleY(0.8) scaleX(1.1); opacity: 0.8; }
+            100% { transform: scaleY(1); opacity: 1; }
+        }
+
+        /* --- RECTIFIED: FINAL SECTION WITH LIGHT BACKGROUND --- */
+        .final-section {
+            height: 100vh; display: flex; justify-content: center; align-items: center;
+            position: relative; overflow: hidden;
+            /* Replaced dark background with main theme background */
+            background-color: var(--blush-pink);
+        }
+        #birthday {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;
+        }
+        .final-animation {
+            text-align: center; font-size: clamp(3rem, 12vw, 7rem); font-weight: 700;
+            /* Changed color for visibility on light background */
+            color: var(--text-dark);
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+            z-index: 2;
+            opacity: 0; transform: scale(0.5); animation: finalReveal 3s ease-out forwards; animation-delay: 1s;
+        }
+        .final-animation .heartbeat { display: inline-block; animation: heartbeat 1.5s infinite ease-in-out; color: var(--darker-pink); }
+        @keyframes finalReveal { to { opacity: 1; transform: scale(1); } }
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); }
+        }
+
+        /* --- MUSIC MODAL --- */
+        .music-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(10px); z-index: 2000; display: flex; justify-content: center; align-items: center; text-align: center;
+        }
+        .music-modal-content h2 { font-size: 3rem; margin-bottom: 20px; color: white; }
+        #start-button {
+            background: var(--soft-pink); color: var(--text-dark); border: none; padding: 15px 40px;
+            font-size: 1.8rem; font-family: var(--handwriting-font); border-radius: 50px; cursor: pointer; transition: transform 0.2s;
+        }
+        #start-button:hover { transform: scale(1.1); }
+        
+        /* --- RESPONSIVENESS --- */
+        @media screen and (max-width: 768px) {
+            .timeline::after { left: 31px; }
+            .timeline-container { width: 100%; padding-left: 70px; padding-right: 25px; }
+            .timeline-container.right { left: 0%; }
+            .timeline-container.left::after, .timeline-container.right::after { left: 15px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="hearts-container"></div>
+    <div class="music-modal" id="music-modal">
+        <div class="music-modal-content">
+            <h2>Our story is about to begin...</h2>
+            <button id="start-button">Click here to start 🎶</button>
+        </div>
+    </div>
+    <audio id="background-music" src="romantic-piano.mp3" loop></audio>
+
+    <header class="parallax" id="hero-parallax">
+        <div class="hero-content">
+            <h1>2 Years of Us</h1>
+            <p>Happy Anniversary, Rangabati</p>
+        </div>
+    </header>
+    <section class="section">
+        <p class="love-quote">"Together is my favorite place to be."</p>
+    </section>
+    <section class="section" id="timeline-section">
+        <h2 class="section-title">Our 2 Year Journey</h2>
+        <div class="timeline"><div class="timeline-container left"><div class="timeline-content"><p class="date">August 8, 2023</p><h3>The Beginning</h3><p>Where it all started. Our First Mix Juice vaali date, the first spark...</p></div></div>
+            <div class="timeline-container right"><div class="timeline-content"><p class="date">Septmember 2 2023</p><h3>Our First Movie Together</h3><p>Rode on 2 wheeler to watch Oppenheimer</p></div></div>
+            <div class="timeline-container left"><div class="timeline-content"><p class="date">February 7 2024</p><h3>Our First Trip in Car</h3><p>Explored Ambience with my favoritest person on her special day.</p></div></div>
+            <div class="timeline-container right"><div class="timeline-content"><p class="date">August 8, 2024</p><h3>One Year Down!</h3><p>Celebrating 365 days of laughter and endless love.</p></div></div>
+            <div class="timeline-container left"><div class="timeline-content"><p class="date">Today, August 10, 2025</p><h3>Two Years & Counting</h3><p>730 days with you, and my heart has never been happier.</p></div></div>
+        </div>
+    </section>
+    
+    <section class="section" id="love-grows-section">
+        <h2 class="section-title">Our Love story has just started to Bloom</h2>
+        <svg class="love-tree-svg" id="love-tree" viewBox="0 0 800 600">
+            <path class="branch branch-1" d="M400 600 V250"></path>
+            <path class="branch branch-2" d="M400 500 c -50 -50 -50 -100 -100 -150"></path>
+            <path class="branch branch-3" d="M400 400 c 50 -50 50 -100 100 -150"></path>
+            <path class="branch branch-4" d="M300 350 c -50 -50 -50 -100 -100 -100"></path>
+            <path class="branch branch-5" d="M500 250 c 50 -50 50 -100 100 -100"></path>
+            <path class="branch branch-6" d="M400 250 c 0 -50 50 -100 100 -100"></path>
+            <path class="branch branch-7" d="M400 250 c 0 -50 -50 -100 -100 -100"></path>
+            <text class="love-flower flower-8"  x="290" y="340">♥</text>
+            <text class="love-flower flower-9"  x="490" y="240">♥</text>
+            <text class="love-flower flower-1"  x="190" y="240">♥</text>
+            <text class="love-flower flower-2"  x="600" y="140">♥</text>
+            <text class="love-flower flower-3"  x="500" y="140">♥</text>
+            <text class="love-flower flower-4"  x="290" y="140">♥</text>
+            <text class="love-flower flower-5"  x="390" y="200">♥</text>
+            <text class="love-flower flower-6"  x="450" y="280">♥</text>
+            <text class="love-flower flower-7"  x="240" y="280">♥</text>
+            <text class="love-flower flower-10" x="560" y="190">♥</text>
+            <text class="love-flower flower-11" x="230" y="190">♥</text>
+            <text class="love-flower flower-12" x="340" y="100">♥</text>
+            <text class="love-flower flower-13" x="450" y="100">♥</text>
+        </svg>
+    </section>
+
+    <section class="section">
+        <p class="love-quote">"You are my today and all of my tomorrows."</p>
+    </section>
+
+    <section class="section" id="letter-section">
+        <h2 class="section-title">A Letter For You</h2>
+        <div class="love-letter"><p>My Dearest Rangabati,</p>
+            <p>If someone had told me two years ago that I would get to be with a lovely girl you, I wouldn't have believed them. These years with you have been the most vibrant, joyful, and meaningful of my life. You've taught me what it means to truly love and be loved.</p>
+            <p>From our silly inside jokes to those downful moments, every moment with you feels like home. You are my greatest adventure and my calmest harbor. Thank you for everything.</p>
+            <p class="signature">Forever yours, <br>Kartik</p>
+        </div>
+    </section>
+    <section class="section" id="cake-section">
+        <h2 class="section-title">A Little Celebration</h2>
+        <div class="cake-container">
+            <div class="cake">
+                <div class="plate"></div><div class="layer"></div><div class="icing"><div class="drip drip1"></div><div class="drip drip2"></div><div class="drip drip3"></div></div>
+                <div class="candle candle1"><div class="flame"></div></div><div class="candle candle2"><div class="flame"></div></div>
+            </div>
+        </div>
+    </section>
+    <section class="final-section">
+        <canvas id="birthday"></canvas>
+        <h2 class="final-animation">Here’s to Forever <span class="heartbeat">❤️</span></h2>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        if (entry.target.id === 'love-tree') {
+                            entry.target.classList.add('start-growing');
+                        }
+                    }
+                });
+            }, { threshold: 0.2 });
+
+            document.querySelectorAll('.love-quote, .timeline-container, #love-tree').forEach(el => {
+                observer.observe(el);
+            });
+
+            const branches = document.querySelectorAll('.love-tree-svg .branch');
+            branches.forEach(path => {
+                const length = path.getTotalLength();
+                path.style.strokeDasharray = length;
+                path.style.strokeDashoffset = length;
+            });
+
+            const heartsContainer = document.getElementById('hearts-container');
+            if (heartsContainer) {
+                const createHeart = () => {
+                    const heart = document.createElement('div');
+                    heart.classList.add('heart'); heart.innerText = '❤';
+                    heart.style.left = Math.random() * 100 + 'vw';
+                    heart.style.animationDuration = Math.random() * 5 + 5 + 's';
+                    heart.style.fontSize = Math.random() * 15 + 10 + 'px';
+                    heartsContainer.appendChild(heart);
+                    setTimeout(() => heart.remove(), 10000);
+                };
+                setInterval(createHeart, 300);
+            }
+
+            const musicModal = document.getElementById('music-modal');
+            const startButton = document.getElementById('start-button');
+            const backgroundMusic = document.getElementById('background-music');
+            startButton.addEventListener('click', () => {
+                backgroundMusic.play().catch(e => console.error("Autoplay failed:", e));
+                musicModal.style.display = 'none';
+            });
+
+            // --- RECTIFIED: CANVAS FIREWORKS SCRIPT ---
+            const canvas = document.getElementById('birthday');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            let w = canvas.width = window.innerWidth;
+            let h = canvas.height = window.innerHeight;
+            
+            // New colors that will show up on the light background
+            const fireworkColors = [
+                '#5a3e3e', // Text Dark
+                '#d4af37', // Gold
+                '#e0a198', // Darker Pink
+                '#b76e79'  // Dusty Rose from an earlier theme
+            ];
+
+            function Particle(x, y, vx, vy) {
+                this.x = x; this.y = y; this.vx = vx; this.vy = vy;
+                this.lifespan = Math.random() * 1.5 + 0.5;
+                // Use the new color palette
+                this.color = fireworkColors[Math.floor(Math.random() * fireworkColors.length)];
+            }
+            Particle.prototype.update = function(dt) {
+                this.lifespan -= dt;
+                this.x += this.vx * dt * 60;
+                this.y += this.vy * dt * 60;
+                this.vy += 0.01 * dt * 60; // Gravity
+            };
+            Particle.prototype.draw = function() {
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.lifespan > 1 ? 1 : this.lifespan;
+                ctx.fillRect(this.x, this.y, 3, 3);
+            };
+
+            function createFirework() {
+                if (Math.random() < 0.05) {
+                    const x = w * (Math.random() * 0.6 + 0.2);
+                    const y = h * (Math.random() * 0.4 + 0.1);
+                    const numParticles = 100;
+                    for (let i = 0; i < numParticles; i++) {
+                        const angle = Math.random() * Math.PI * 2;
+                        const speed = Math.random() * 4 + 1;
+                        const vx = Math.cos(angle) * speed * 0.05;
+                        const vy = Math.sin(angle) * speed * 0.05;
+                        particles.push(new Particle(x, y, vx, vy));
+                    }
+                }
+            }
+
+            let lastTime = 0;
+            function animate(time) {
+                // Clear the canvas with a semi-transparent layer for a subtle trail effect
+                ctx.globalAlpha = 0.1;
+                ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--blush-pink');
+                ctx.fillRect(0, 0, w, h);
+                ctx.globalAlpha = 1;
+
+                const dt = (time - lastTime) / 1000;
+                lastTime = time;
+
+                createFirework();
+                
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    particles[i].update(dt);
+                    particles[i].draw();
+                    if (particles[i].lifespan <= 0) {
+                        particles.splice(i, 1);
+                    }
+                }
+                requestAnimationFrame(animate);
+            }
+
+            window.addEventListener('resize', () => {
+                w = canvas.width = window.innerWidth;
+                h = canvas.height = window.innerHeight;
+            });
+            
+            animate(0);
+        });
+    </script>
+</body>
+</html>
